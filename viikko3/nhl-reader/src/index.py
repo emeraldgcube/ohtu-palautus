@@ -20,8 +20,9 @@ def main():
 
         players.append(player)
 
-    print("Oliot:")
-    for player in players:
+    jarkkapelaajat = sorted(players, key=lambda player: (player.goals, player.assists))
+    jarkkapelaajat.reverse()
+    for player in jarkkapelaajat:
         #print(player)
         if player.nationality == "FIN":
             print (player)
