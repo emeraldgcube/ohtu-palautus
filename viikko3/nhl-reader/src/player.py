@@ -9,5 +9,5 @@ class Player:
         self.games=games
 
     def __str__(self):
-        loru= f"{self.name:20} {self.nationality}, {str(self.goals)} + {str(self.assists)} = {str(self.assists + self.goals)}, {str(self.games)} peliä"
+        loru= f"{self.name:20} {self.nationality}, {str(self.goals)} + {str(self.assists)} = {str(self.assists + self.goals)}"
         return loru
