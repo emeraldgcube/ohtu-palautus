@@ -10,7 +10,7 @@ class TestKauppa(unittest.TestCase):
         self.pankki_mock = Mock()
         self.varasto_mock = Mock()
         self.viitegeneraattori_mock = Mock()
-        # palautetaan aina arvo 42
+        # palautetaan aina arvo 42Viitegeneraattori
         self.viitegeneraattori_mock.uusi.return_value = 42
 
         # tehdään toteutus saldo-metodille
@@ -89,4 +89,50 @@ class TestKauppa(unittest.TestCase):
 
         self.pankki_mock.tilisiirto.assert_called_with('pekka', 42, '12345', '33333-44455', 5)
 
+    def test_aloita_asiointi_metodi_nollaa_ostoskorin(self):
+
+        kauppa = Kauppa(self.varasto_mock, self.pankki_mock, self.viitegeneraattori_mock)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with(ANY, ANY, ANY, ANY, 5)
+
+    def test_antaa_eri_viitteet(self):
    
+        kauppa = Kauppa(self.varasto_mock, self.pankki_mock, self.viitegeneraattori_mock)
+        self.viitegeneraattori_mock.uusi.side_effect = [1, 2, 3]
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with(ANY, 1, ANY, ANY, ANY)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with(ANY, 2, ANY, ANY, ANY)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with(ANY, 3, ANY, ANY, ANY)
+
+    def test_poista_tuote_korista(self):
+        kauppa = Kauppa(self.varasto_mock, self.pankki_mock, self.viitegeneraattori_mock)
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(2)
+        kauppa.lisaa_koriin(1)
+        kauppa.poista_korista(1)
+        kauppa.tilimaksu("pekka", "12345")
+
+        self.pankki_mock.tilisiirto.assert_called_with(ANY, ANY, ANY, ANY, 3)
